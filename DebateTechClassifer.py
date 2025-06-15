@@ -2,11 +2,10 @@ import pandas as pd
 from datasets import Dataset
 from sklearn.preprocessing import MultiLabelBinarizer
 import json
-print("Loading libraries")
 from tensorflow import keras
 from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments
 import torch
-
+print("Loaded libraries")
 
 examples = []
 with open("C:/Users/samue/Downloads/Blackrock Assessment/DebateAnalysis/CleanData.jsonl", "r") as f:
@@ -16,6 +15,8 @@ with open("C:/Users/samue/Downloads/Blackrock Assessment/DebateAnalysis/CleanDat
             "text": row["text"],
             "labels": row["labels"]
         })
+part = len(examples)//4 *3
+examples = examples[:part]
 print("data Loaded")
 rhetorical_mapping = {
     "Loaded Language": "pathos",
@@ -94,11 +95,11 @@ class MultiLabelBERT(torch.nn.Module):
 model = MultiLabelBERT("bert-base-uncased", num_labels=5)
 training_args = TrainingArguments(
     output_dir="C:/Users/samue/Downloads/Blackrock Assessment/DebateAnalysis/rhetoric_model",
-    per_device_train_batch_size=16,
+    per_device_train_batch_size=4,
     num_train_epochs=4,
     save_strategy="epoch",
     logging_dir="C:/Users/samue/Downloads/Blackrock Assessment/DebateAnalysis/logs",
-    logging_steps=100
+    logging_steps=1000
 )
 trainer = Trainer(
     model=model,
