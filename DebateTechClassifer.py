@@ -15,8 +15,8 @@ with open("C:/Users/samue/Downloads/Blackrock Assessment/DebateAnalysis/CleanDat
             "text": row["text"],
             "labels": row["labels"]
         })
-part = len(examples)//4 *3
-examples = examples[:part]
+# part = len(examples)//4 *3
+# examples = examples[:part]
 print("data Loaded")
 rhetorical_mapping = {
     "Loaded Language": "pathos",
@@ -43,11 +43,11 @@ rhetorical_mapping = {
 def map_labels(label_list):
     return list(set(rhetorical_mapping[label] for label in label_list if label in rhetorical_mapping))
 df = pd.DataFrame(examples)
-df['mapped_labels'] = df['labels'].apply(map_labels)
+# df['mapped_labels'] = df['labels'].apply(map_labels)
+df['flat_labels'] = df['labels']
 
-
-mlb = MultiLabelBinarizer(classes=["pathos", "ethos", "logos", "statistics", "anecdote"])
-label_matrix = mlb.fit_transform(df['mapped_labels'])
+mlb = MultiLabelBinarizer()
+label_matrix = mlb.fit_transform(df['flat_labels'])
 
 df['label_vector'] = label_matrix.tolist()
 
@@ -92,19 +92,21 @@ class MultiLabelBERT(torch.nn.Module):
             loss_fct = torch.nn.BCEWithLogitsLoss()
             loss = loss_fct(logits, labels)
         return {"loss": loss, "logits": logits}
-model = MultiLabelBERT("bert-base-uncased", num_labels=5)
+model = MultiLabelBERT("bert-base-uncased", num_labels=len(mlb.classes_))
 training_args = TrainingArguments(
     output_dir="C:/Users/samue/Downloads/Blackrock Assessment/DebateAnalysis/rhetoric_model",
-    per_device_train_batch_size=4,
-    num_train_epochs=4,
+    per_device_train_batch_size=16,
+    num_train_epochs=10,
     save_strategy="epoch",
     logging_dir="C:/Users/samue/Downloads/Blackrock Assessment/DebateAnalysis/logs",
-    logging_steps=1000
+    logging_steps=250
 )
 trainer = Trainer(
     model=model,
     args=training_args,
     train_dataset=train_dataset,
 )
+print(df['flat_labels'].explode().value_counts())
+print(df)
 trainer.train()
 torch.save(model.state_dict(), "C:/Users/samue/Downloads/Blackrock Assessment/DebateAnalysis/rhetoric_model.pt")
