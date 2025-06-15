@@ -6,8 +6,8 @@ from collections import defaultdict
 from nltk.tokenize import PunktSentenceTokenizer, sent_tokenize
 print("1")
 
-ARTICLES_DIR = "C:/Users/samue/Downloads/Blackrock Assessment/PropagandaDetection-master/datasets/train-articles"
-LABELS_DIR = "C:/Users/samue/Downloads/Blackrock Assessment/PropagandaDetection-master/datasets/train-labels-FLC"
+ARTICLES_DIR = "C:/Users/samue/Downloads/Blackrock Assessment/DebateAnalysis/PropagandaDetection-master/datasets/train-articles"
+LABELS_DIR = "C:/Users/samue/Downloads/Blackrock Assessment/DebateAnalysis/PropagandaDetection-master/datasets/train-labels-FLC"
 
 data = []
 print("1.5")
@@ -66,18 +66,25 @@ for fname in os.listdir(ARTICLES_DIR):
 
     for i, (sent_start, sent_end, sent_text) in enumerate(sentence_spans):
         labels = list(sentence_labels.get(i, []))
-        if labels != []:
-            data.append({
-                "article_id": article_id,
-                "sentence_id": i,
-                "text": sent_text.strip(),
-                "labels": labels
-            })
+        # if labels != []:
+        #     data.append({
+        #         "article_id": article_id,
+        #         "sentence_id": i,
+        #         "text": sent_text.strip(),
+        #         "labels": labels
+        #     })
+        data.append({
+            "article_id": article_id,
+            "sentence_id": i,
+            "text": sent_text.strip(),
+            "labels": labels
+        })
 
 
 df = pd.DataFrame(data)
 print(df.head(20))
+print(df.size)
 
 # Optional: Save to CSV or JSONL
-df.to_json("C:/Users/samue/Downloads/Blackrock Assessment/data.jsonl", orient="records", lines=True)
+# df.to_json("C:/Users/samue/Downloads/Blackrock Assessment/DebateAnalysis/CleanData.jsonl", orient="records", lines=True)
 print("done")
